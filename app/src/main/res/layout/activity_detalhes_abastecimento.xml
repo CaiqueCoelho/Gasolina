@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/rootView"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="caiquecoelho.com.gasolina.DetalhesAbastecimentoActivity">
+
+    <TextView
+        android:id="@+id/textView20"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="24dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="21dp"
+        android:text="Posto" />
+
+    <TextView
+        android:id="@+id/txtPosto"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/textView20"
+        android:layout_alignStart="@+id/textView20"
+        android:layout_below="@+id/textView20"
+        android:text="                                                                 "
+        android:textSize="@dimen/abastecer_size" />
+
+    <TextView
+        android:id="@+id/textView11"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/txtPosto"
+        android:layout_alignStart="@+id/txtPosto"
+        android:layout_below="@+id/txtPosto"
+        android:layout_marginTop="16dp"
+        android:text="Data" />
+
+    <TextView
+        android:id="@+id/txtData"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/textView11"
+        android:layout_alignStart="@+id/textView11"
+        android:layout_below="@+id/textView11"
+        android:text="                                   "
+        android:textSize="@dimen/abastecer_size" />
+
+    <TextView
+        android:id="@+id/textViewPreco"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/txtData"
+        android:layout_alignStart="@+id/txtData"
+        android:layout_below="@+id/txtData"
+        android:layout_marginTop="20dp"
+        android:text="Preço" />
+
+    <TextView
+        android:id="@+id/txtPreco"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textViewPreco"
+        android:layout_alignLeft="@+id/textViewPreco"
+        android:layout_alignStart="@+id/textViewPreco"
+        android:text="                        "
+        android:textSize="@dimen/abastecer_size" />
+
+    <TextView
+        android:id="@+id/textView16"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/textViewPreco"
+        android:layout_centerHorizontal="true"
+        android:text="Tipo" />
+
+    <TextView
+        android:id="@+id/txtTipo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/textView16"
+        android:layout_alignStart="@+id/textView16"
+        android:layout_below="@+id/textView16"
+        android:text="                                    "
+        android:textSize="@dimen/abastecer_size" />
+
+    <TextView
+        android:id="@+id/textView18"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/textViewPreco"
+        android:layout_alignStart="@+id/textViewPreco"
+        android:layout_below="@+id/txtPreco"
+        android:layout_marginTop="30dp"
+        android:text="Quantidade Abastecida" />
+
+    <TextView
+        android:id="@+id/txtQtde"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/textView18"
+        android:layout_alignStart="@+id/textView18"
+        android:layout_below="@+id/textView18"
+        android:text="                                                     "
+        android:textSize="@dimen/abastecer_size" />
+
+    <TextView
+        android:id="@+id/textViewTotal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/txtQtde"
+        android:layout_alignStart="@+id/txtQtde"
+        android:layout_below="@+id/txtQtde"
+        android:layout_marginTop="24dp"
+        android:text="Litros Abastecidos" />
+
+    <TextView
+        android:id="@+id/txtLitros"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/textViewTotal"
+        android:layout_alignStart="@+id/textViewTotal"
+        android:layout_below="@+id/textViewTotal"
+        android:text="                                                     "
+        android:textSize="@dimen/abastecer_size" />
+
+</RelativeLayout>

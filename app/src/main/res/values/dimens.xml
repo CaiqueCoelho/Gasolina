@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="gasolina_width">150dp</dimen>
+    <dimen name="gasolina_height">200dp</dimen>
+    <dimen name="gasolina_size">30sp</dimen>
+    <dimen name="texto_size">16sp</dimen>
+    <dimen name="historico_size">20sp</dimen>
+    <dimen name="add_width">60dp</dimen>
+    <dimen name="add_height">60dp</dimen>
+    <dimen name="add_width4">90dp</dimen>
+    <dimen name="add_height4">90dp</dimen>
+    <dimen name="add_width3">30dp</dimen>
+    <dimen name="add_height3">60dp</dimen>
+    <dimen name="add_width2">100dp</dimen>
+    <dimen name="add_height2">100dp</dimen>
+    <dimen name="size_error">10sp</dimen>
+    <dimen name="abastecer_size">20sp</dimen>
+    <dimen name="car_width">40dp</dimen>
+    <dimen name="car_height">40dp</dimen>
+    <dimen name="opcional_size">10sp</dimen>
+</resources>

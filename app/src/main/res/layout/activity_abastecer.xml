@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/rootView"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/background_light"
+    tools:context="caiquecoelho.com.gasolina.AbastecerActivity">
+
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="28dp"
+        android:layout_marginStart="28dp"
+        android:layout_marginTop="23dp"
+        android:text="Posto"
+        android:textSize="@dimen/abastecer_size" />
+
+    <EditText
+        android:id="@+id/edtPosto"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/textView3"
+        android:layout_alignStart="@+id/textView3"
+        android:layout_below="@+id/textView3"
+        android:ems="10"
+        android:hint="Digite o nome do Posto"
+        android:inputType="textPersonName" />
+
+    <TextView
+        android:id="@+id/textView6"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignEnd="@+id/edtPosto"
+        android:layout_alignLeft="@+id/edtPosto"
+        android:layout_alignRight="@+id/edtPosto"
+        android:layout_alignStart="@+id/edtPosto"
+        android:layout_below="@+id/edtPosto"
+        android:textSize="@dimen/opcional_size" />
+
+    <TextView
+        android:id="@+id/textView9"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/textView6"
+        android:layout_alignStart="@+id/textView6"
+        android:layout_below="@+id/textView6"
+        android:layout_marginTop="16dp"
+        android:text="Preço"
+        android:textSize="@dimen/abastecer_size" />
+
+    <EditText
+        android:id="@+id/edtPreco"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/textView9"
+        android:layout_alignStart="@+id/textView9"
+        android:layout_below="@+id/textView9"
+        android:ems="10"
+        android:hint="Digite o preço do litro"
+        android:inputType="number" />
+
+    <TextView
+        android:id="@+id/txtErroPreco"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignEnd="@+id/edtPreco"
+        android:layout_alignLeft="@+id/edtPreco"
+        android:layout_alignRight="@+id/edtPreco"
+        android:layout_alignStart="@+id/edtPreco"
+        android:layout_below="@+id/edtPreco"
+        android:textColor="?attr/colorError" />
+
+    <TextView
+        android:id="@+id/textView12"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/txtErroPreco"
+        android:layout_alignStart="@+id/txtErroPreco"
+        android:layout_below="@+id/txtErroPreco"
+        android:layout_marginTop="12dp"
+        android:text="Tipo:"
+        android:textSize="@dimen/abastecer_size" />
+
+    <RadioGroup
+        android:id="@+id/radioGroup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/textView12"
+        android:layout_toEndOf="@+id/textView3"
+        android:layout_toRightOf="@+id/textView3">
+
+        <RadioButton
+            android:id="@+id/radioAlcool"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Álcool" />
+
+        <RadioButton
+            android:id="@+id/radioGasolina"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/radioGroup"
+            android:layout_toEndOf="@+id/textView9"
+            android:layout_toRightOf="@+id/textView9"
+            android:layout_weight="1"
+            android:text="Gasolina" />
+    </RadioGroup>
+
+    <TextView
+        android:id="@+id/txtErroTipo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignEnd="@+id/txtErroPreco"
+        android:layout_alignLeft="@+id/radioGroup"
+        android:layout_alignRight="@+id/txtErroPreco"
+        android:layout_alignStart="@+id/radioGroup"
+        android:layout_below="@+id/radioGroup"
+        android:textColor="?attr/colorError" />
+
+    <TextView
+        android:id="@+id/textView7"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/textView12"
+        android:layout_alignStart="@+id/textView12"
+        android:layout_below="@+id/txtErroTipo"
+        android:layout_marginTop="15dp"
+        android:text="Quantidade abastecida"
+        android:textSize="@dimen/abastecer_size" />
+
+    <faranjit.currency.edittext.CurrencyEditText
+        android:id="@+id/edtQuantidade"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/textView7"
+        android:layout_alignStart="@+id/textView7"
+        android:layout_below="@+id/textView7"
+        android:ems="10"
+        android:hint="Digite a qtd abastecida"
+        app:locale="pt_BR"
+        app:showSymbol="false" />
+
+    <ToggleButton
+        android:id="@+id/btnReal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/edtQuantidade"
+        android:layout_marginLeft="14dp"
+        android:layout_marginStart="14dp"
+        android:layout_toEndOf="@+id/txtErroTipo"
+        android:layout_toRightOf="@+id/txtErroTipo"
+        android:background="@android:color/holo_orange_dark"
+        android:text="ToggleButton"
+        android:textColor="@android:color/background_light"
+        android:textColorLink="@android:color/background_light"
+        android:textOff="Reais"
+        android:textOn="Litros" />
+
+    <TextView
+        android:id="@+id/txtErroQuantidade"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/edtQuantidade"
+        android:layout_alignStart="@+id/edtQuantidade"
+        android:layout_below="@+id/edtQuantidade"
+        android:layout_toLeftOf="@+id/btnReal"
+        android:layout_toStartOf="@+id/btnReal"
+        android:textColor="?attr/colorError" />
+
+    <TextView
+        android:id="@+id/textView10"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/txtErroQuantidade"
+        android:layout_alignStart="@+id/txtErroQuantidade"
+        android:layout_below="@+id/txtErroQuantidade"
+        android:layout_marginTop="15dp"
+        android:text="Carro:" />
+
+    <Spinner
+        android:id="@+id/carro"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/textView10"
+        android:layout_alignEnd="@+id/txtErroTipo"
+        android:layout_alignRight="@+id/txtErroTipo"
+        android:layout_toEndOf="@+id/textView9"
+        android:layout_toRightOf="@+id/textView9" />
+
+    <ImageView
+        android:id="@+id/btnNovoCarro"
+        android:layout_width="@dimen/add_width3"
+        android:layout_height="@dimen/add_height"
+        android:layout_alignBottom="@+id/carro"
+        android:layout_alignTop="@+id/textView10"
+        android:layout_toEndOf="@+id/carro"
+        android:layout_toRightOf="@+id/carro"
+        app:srcCompat="@drawable/novocarro" />
+
+    <ImageView
+        android:id="@+id/btnSalvar"
+        android:layout_width="@dimen/add_width4"
+        android:layout_height="@dimen/add_height4"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginEnd="17dp"
+        android:layout_marginRight="17dp"
+        app:srcCompat="@drawable/salvar_abastecimento" />
+
+</RelativeLayout>

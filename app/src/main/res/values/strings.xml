@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">Gasolina?</string>
+    <string name="alcool_gasolina">Descubra se é melhor abastecer gasolina ou álcool digitando o valor do litro</string>
+    <string name="calcular_btn">Calcular</string>
+    <string name="historico_text">HISTÓRICO</string>
+</resources>
