@@ -44,12 +44,34 @@
         android:textSize="@dimen/opcional_size" />
 
     <TextView
-        android:id="@+id/textView9"
+        android:id="@+id/textViewKM"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/textView6"
         android:layout_alignStart="@+id/textView6"
         android:layout_below="@+id/textView6"
+        android:layout_marginTop="16dp"
+        android:text="Quilometros Rodados atualmente"
+        android:textSize="@dimen/abastecer_size" />
+
+    <EditText
+        android:id="@+id/edtKMs"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/textViewKM"
+        android:layout_alignStart="@+id/textViewKM"
+        android:layout_below="@+id/textViewKM"
+        android:ems="10"
+        android:hint="Digite os kms rodados"
+        android:inputType="number" />
+
+    <TextView
+        android:id="@+id/textView9"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/textView6"
+        android:layout_alignStart="@+id/textView6"
+        android:layout_below="@+id/edtKMs"
         android:layout_marginTop="16dp"
         android:text="Preço"
         android:textSize="@dimen/abastecer_size" />
@@ -135,7 +157,8 @@
         android:text="Quantidade abastecida"
         android:textSize="@dimen/abastecer_size" />
 
-    <faranjit.currency.edittext.CurrencyEditText
+    <!--
+    <com.cottacush.android.currencyedittext.CurrencyEditText
         android:id="@+id/edtQuantidade"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -144,14 +167,27 @@
         android:layout_below="@+id/textView7"
         android:ems="10"
         android:hint="Digite a qtd abastecida"
-        app:locale="pt_BR"
-        app:showSymbol="false" />
+        app:currencySymbol="R$"
+        app:localeTag="en-NG"
+        app:useCurrencySymbolAsHint="true" />
+   -->
+
+    <EditText
+        android:id="@+id/edtQuantidadeNew"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:layout_alignLeft="@+id/textView7"
+        android:layout_alignStart="@+id/textView7"
+        android:layout_below="@+id/textView7"
+        android:inputType="numberDecimal"
+        />
 
     <ToggleButton
         android:id="@+id/btnReal"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/edtQuantidade"
+        android:layout_alignBottom="@+id/edtQuantidadeNew"
         android:layout_marginLeft="14dp"
         android:layout_marginStart="14dp"
         android:layout_toEndOf="@+id/txtErroTipo"
@@ -167,9 +203,9 @@
         android:id="@+id/txtErroQuantidade"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/edtQuantidade"
-        android:layout_alignStart="@+id/edtQuantidade"
-        android:layout_below="@+id/edtQuantidade"
+        android:layout_alignLeft="@+id/edtQuantidadeNew"
+        android:layout_alignStart="@+id/edtQuantidadeNew"
+        android:layout_below="@+id/edtQuantidadeNew"
         android:layout_toLeftOf="@+id/btnReal"
         android:layout_toStartOf="@+id/btnReal"
         android:textColor="?attr/colorError" />

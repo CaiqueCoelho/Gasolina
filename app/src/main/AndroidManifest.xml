@@ -9,17 +9,20 @@
         android:roundIcon="@mipmap/ic_launcher"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity">
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".AbastecerActivity" />
-        <activity android:name=".CarroActivity" />
-        <activity android:name=".HistoricoActivity" />
-        <activity android:name=".DetalhesAbastecimentoActivity"></activity>
+        <activity android:name=".AbastecerActivity" android:exported="true" />
+        <activity android:name=".CarroActivity" android:exported="true" />
+        <activity android:name=".HistoricoActivity" android:exported="true" />
+        <activity android:name=".DetalhesAbastecimentoActivity" android:exported="true" />
 
     </application>
 

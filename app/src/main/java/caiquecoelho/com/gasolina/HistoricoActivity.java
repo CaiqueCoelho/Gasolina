@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.os.Build;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -17,11 +17,18 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 public class HistoricoActivity extends AppCompatActivity {
 
     private ListView listView;
+    private TextView txtNextRefuelling;
+    private TextView textViewNextRefuelling;
 
     private SQLiteDatabase bancoDeDados;
     private ArrayList<Integer> listaIds;
@@ -33,6 +40,7 @@ public class HistoricoActivity extends AppCompatActivity {
     private ArrayList<String> listaReal;
     private ArrayList<String> listaTipos;
     private ArrayList<String> listaLitros;
+    private ArrayList<String> listaKms;
     private ArrayList<String> listaAbastecimentos;
 
     private ArrayAdapter<String> arrayAdapter;
@@ -75,6 +83,8 @@ public class HistoricoActivity extends AppCompatActivity {
         setTitle("Histórico Abastecimentos");
 
         listView = (ListView) findViewById(R.id.listView);
+        txtNextRefuelling = (TextView) findViewById(R.id.txtNextRefuelling);
+        textViewNextRefuelling = (TextView) findViewById(R.id.textViewNextRefuelling);
 
         try{
             bancoDeDados = openOrCreateDatabase("app_gasolina", MODE_PRIVATE, null);
@@ -97,7 +107,21 @@ public class HistoricoActivity extends AppCompatActivity {
                     String tipo = listaTipos.get(position);
                     String quantidadeAbastecida = listaQuantidades.get(position);
                     String litrosAbatecido = listaLitros.get(position);
+                    String kms = listaKms.get(position);
                     String real = listaReal.get(position);
+                    String lastKms = null;
+                    String lastLitrosAbastecidos = null;
+                    try{
+                        lastKms = listaKms.get(position-1);
+                    } catch (Exception error) {
+                        Log.e("Error geting next kms", error.getMessage());
+                    }
+
+                    try{
+                        lastLitrosAbastecidos = listaLitros.get(position-1);
+                    } catch (Exception error) {
+                        Log.e("Error geting next litrs", error.getMessage());
+                    }
 
                     Intent intentDetalhes = new Intent(HistoricoActivity.this, DetalhesAbastecimentoActivity.class);
                     intentDetalhes.putExtra("posto", posto);
@@ -106,7 +130,19 @@ public class HistoricoActivity extends AppCompatActivity {
                     intentDetalhes.putExtra("tipo", tipo);
                     intentDetalhes.putExtra("quantidade", quantidadeAbastecida);
                     intentDetalhes.putExtra("litros", litrosAbatecido);
+                    intentDetalhes.putExtra("kms", kms);
                     intentDetalhes.putExtra("real", real);
+                    try{
+                        intentDetalhes.putExtra("lastKms", lastKms);
+                    } catch (Exception error) {
+                        Log.e("Error geting next kms", error.getMessage());
+                    }
+
+                    try{
+                        intentDetalhes.putExtra("lastLitrosAbastecidos", lastLitrosAbastecidos);
+                    } catch (Exception error) {
+                        Log.e("Error geting next litrs", error.getMessage());
+                    }
 
                     startActivity(intentDetalhes);
                 }catch (Exception e){
@@ -120,6 +156,8 @@ public class HistoricoActivity extends AppCompatActivity {
 
         try{
             Cursor cursor = bancoDeDados.rawQuery("SELECT * FROM abastecimentos ORDER BY id DESC", null);
+            Log.i("getColumnNames", ""+cursor.getColumnNames().length);
+            Log.i("getExtras", cursor.getExtras().toString());
 
             //recuperando os ids das colunas
             int idColunaid = cursor.getColumnIndex("id");
@@ -131,6 +169,7 @@ public class HistoricoActivity extends AppCompatActivity {
             int idColunaReal = cursor.getColumnIndex("real");
             int idColunaTipo = cursor.getColumnIndex("tipo");
             int idColunaLitros = cursor.getColumnIndex("qtdAbastecida");
+            int idKms = cursor.getColumnIndex("kms");
 
             //Criando adaptadores e listas
             listaIds = new ArrayList<Integer>();
@@ -142,6 +181,7 @@ public class HistoricoActivity extends AppCompatActivity {
             listaReal = new ArrayList<String>();
             listaTipos = new ArrayList<String>();
             listaLitros = new ArrayList<String>();
+            listaKms = new ArrayList<String>();
 
             listaAbastecimentos = new ArrayList<String>();
 
@@ -164,8 +204,13 @@ public class HistoricoActivity extends AppCompatActivity {
                 String data = cursor.getString(idColunaData);
                 listaDatas.add(data);
 
+                Double qtdDouble = null;
                 String quantidade = cursor.getString(idColunaQtde);
-                quantidade.replace(".", ",");
+                if(Double.parseDouble(quantidade) / 100.0 > 1) {
+                    qtdDouble = (Double.parseDouble(quantidade) / 100.0);
+                } else {
+                    qtdDouble = Double.parseDouble(quantidade);
+                }
                 listaQuantidades.add(quantidade);
 
                 String real = cursor.getString(idColunaReal);
@@ -177,16 +222,55 @@ public class HistoricoActivity extends AppCompatActivity {
                 String litros = cursor.getString(idColunaLitros);
                 listaLitros.add(litros);
 
+                Log.i("idColunaLitros", "" + idColunaLitros);
+                Log.i("idKms", ""+idKms);
+                String kms = cursor.getString(idKms);
+                Log.i("kms", ""+kms);
+                listaKms.add(kms);
 
-                String abastecimento = "Carro: " +carro+ ", Abastecido: " +quantidade+ " " +real;
+                String abastecimento = "Carro: " +carro+ ", Abastecido: " +qtdDouble.toString().replace(".", ",")+ " " +real;
                 listaAbastecimentos.add(abastecimento);
 
                 cursor.moveToNext();
+
+                try {
+                    String pattern = "dd-MM-yyyy";
+                    SimpleDateFormat sdf = new SimpleDateFormat(pattern, Locale.getDefault());
+                    Date date1 = sdf.parse(listaDatas.get(0));
+                    Date date2 = sdf.parse(listaDatas.get(1));
+                    long diffInMillis = date2.getTime() - date1.getTime();
+                    int diffInDays = (int) TimeUnit.MILLISECONDS.toDays(diffInMillis);
+                    // txtNextRefuelling.setText(diffInDays + " dias");
+
+                    Calendar currentDate = Calendar.getInstance();
+                    Calendar currentDateBase = Calendar.getInstance();
+                    currentDate.add(Calendar.DAY_OF_YEAR, diffInDays + 1 );
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+                    String currentDateFormat = dateFormat.format(currentDate.getTime());
+
+                    txtNextRefuelling.setText(currentDateFormat);
+
+                    boolean isAfter = currentDateBase.after(currentDate);
+
+                    boolean isSameDate = currentDate.get(Calendar.YEAR) == currentDateBase.get(Calendar.YEAR) &&
+                            currentDate.get(Calendar.MONTH) == currentDateBase.get(Calendar.MONTH) &&
+                            currentDate.get(Calendar.DAY_OF_MONTH) == currentDateBase.get(Calendar.DAY_OF_MONTH);
+
+                    if(isSameDate){
+                        txtNextRefuelling.setBackgroundColor(Color.parseColor("#ffffbb33"));
+                        textViewNextRefuelling.setBackgroundColor(Color.parseColor("#ffffbb33"));
+                    } else if (isAfter) {
+                        txtNextRefuelling.setBackgroundColor(Color.RED);
+                        textViewNextRefuelling.setBackgroundColor(Color.RED);
+                    }
+                } catch (Exception e){
+                    Log.e("Predict Next Refuelling", e.getMessage());
+                }
             }
 
         }catch(Exception e){
             e.printStackTrace();
-            Log.i("Erro ", "ao listar abastecimentos: " +e.toString());
+            Log.e("Erro ", "ao listar abastecimentos: " +e.toString());
             if(listaAbastecimentos == null){
                 listaAbastecimentos = new ArrayList<String>();
                 listaAbastecimentos.add("Nenhum abastecimento registrado");

@@ -127,4 +127,44 @@
         android:text="                                                     "
         android:textSize="@dimen/abastecer_size" />
 
+    <TextView
+        android:id="@+id/textViewKms"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/txtQtde"
+        android:layout_alignStart="@+id/txtQtde"
+        android:layout_below="@+id/txtLitros"
+        android:layout_marginTop="24dp"
+        android:text="Quilômetragem percorrida" />
+
+    <TextView
+        android:id="@+id/txtKms"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/textViewTotal"
+        android:layout_alignStart="@+id/textViewTotal"
+        android:layout_below="@+id/textViewKms"
+        android:text="                                                     "
+        android:textSize="@dimen/abastecer_size" />
+
+    <TextView
+        android:id="@+id/textViewKmsPerLiter"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/txtKms"
+        android:layout_alignStart="@+id/txtKms"
+        android:layout_below="@+id/txtKms"
+        android:layout_marginTop="24dp"
+        android:text="Rendimento último abastecimento" />
+
+    <TextView
+        android:id="@+id/txtKmsPerLiter"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/textViewTotal"
+        android:layout_alignStart="@+id/textViewTotal"
+        android:layout_below="@+id/textViewKmsPerLiter"
+        android:text=""
+        android:textSize="@dimen/abastecer_size" />
+
 </RelativeLayout>

@@ -6,8 +6,10 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Rect;
 import android.os.Build;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewTreeObserver;
@@ -24,22 +26,20 @@ import android.widget.ToggleButton;
 import com.github.rtoshiro.util.format.SimpleMaskFormatter;
 import com.github.rtoshiro.util.format.text.MaskTextWatcher;
 
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
+import java.util.Locale;
 
-import caiquecoelho.com.gasolina.helper.NumberTextWatcher;
 import caiquecoelho.com.gasolina.model.Abastecimento;
-import faranjit.currency.edittext.CurrencyEditText;
 
 public class AbastecerActivity extends AppCompatActivity {
 
     private EditText edtPosto;
     private EditText edtPreco;
-    private CurrencyEditText edtQuantidade;
+    private EditText edtKms;
+    private EditText edtQuantidade;
     private RadioButton radioAlcool;
     private RadioButton radioGasolina;
     private RadioGroup radioGroup;
@@ -50,6 +50,7 @@ public class AbastecerActivity extends AppCompatActivity {
     private Spinner spinnerCarro;
     private ImageView btnSalvar;
     private ImageView btnNovoCarro;
+    private NumberFormat currencyFormat;
 
     private SQLiteDatabase bancoDeDados;
     private ArrayAdapter<String> adapterListaCarro;
@@ -66,6 +67,10 @@ public class AbastecerActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_abastecer);
+
+        edtQuantidade = findViewById(R.id.edtQuantidadeNew);
+        currencyFormat = NumberFormat.getCurrencyInstance(new Locale("pt", "BR"));
+        edtQuantidade.addTextChangedListener(currencyTextWatcher);
 
         fullScreen();
 
@@ -101,7 +106,9 @@ public class AbastecerActivity extends AppCompatActivity {
 
         edtPosto = (EditText) findViewById(R.id.edtPosto);
         edtPreco = (EditText) findViewById(R.id.edtPreco);
-        edtQuantidade = (CurrencyEditText) findViewById(R.id.edtQuantidade);
+        edtKms = (EditText) findViewById(R.id.edtKMs);
+        // edtQuantidade = (MaskEditText) findViewById(R.id.edtQuantidadeNew);
+        //edtQuantidade = (CurrencyEditText) findViewById(R.id.edtQuantidade);
         radioAlcool = (RadioButton) findViewById(R.id.radioAlcool);
         radioGasolina = (RadioButton) findViewById(R.id.radioGasolina);
         radioGroup = (RadioGroup) findViewById(R.id.radioGroup);
@@ -113,10 +120,10 @@ public class AbastecerActivity extends AppCompatActivity {
         btnSalvar = (ImageView) findViewById(R.id.btnSalvar);
         btnNovoCarro = (ImageView) findViewById(R.id.btnNovoCarro);
 
-        edtQuantidade.setMonetaryDivider(',');
+        //edtQuantidade.setMonetaryDivider(',');
 
         SimpleMaskFormatter smfPreco = new SimpleMaskFormatter("N,NN");
-        MaskTextWatcher mtwPreco = new MaskTextWatcher(edtPreco , smfPreco);
+        MaskTextWatcher mtwPreco = new MaskTextWatcher(edtPreco, smfPreco);
         edtPreco.addTextChangedListener(mtwPreco);
 
         Bundle extras = getIntent().getExtras();
@@ -124,6 +131,9 @@ public class AbastecerActivity extends AppCompatActivity {
 
 
         if(extras != null){
+            if(!extras.getString("kms").isEmpty()){
+                edtKms.setText(extras.getString("kms"));
+            }
             edtPosto.setText(extras.getString("posto"));
             edtPreco.setText(extras.getString("preco"));
             edtQuantidade.setText(extras.getString("quantidade"));
@@ -146,7 +156,7 @@ public class AbastecerActivity extends AppCompatActivity {
                 try {
 
                     Calendar currentDate = Calendar.getInstance();
-                    SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MMM-yyyy");
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
                     String formattedDate = dateFormat.format(currentDate.getTime());
 
                     String stringPreco = edtPreco.getText().toString();
@@ -177,14 +187,16 @@ public class AbastecerActivity extends AppCompatActivity {
                     } else {
 
                         String precoSemFormatacao = stringPreco.replace(",", ".");
-                        stringQuantidade = stringQuantidade.replace(".", "");
-                        String quantidadeSemFormatacao = stringQuantidade.replace(",", ".");
+                        String quantidadeSemFormatacao = stringQuantidade.replace(".", "").replace(",", ".").replace("R$", "").replace(" ", "").replace("\\s", "");
+                        quantidadeSemFormatacao = quantidadeSemFormatacao.replaceAll("\\s", "");
+                        Log.i("quantidadeSemFormatacao", quantidadeSemFormatacao);
 
                         double doublePreco = Double.parseDouble(precoSemFormatacao);
                         double doubleQuantidade = Double.parseDouble(quantidadeSemFormatacao);
 
                         double quantidadeLitroAbastecida = doubleQuantidade / doublePreco;
                         double reaisAbastecido = doubleQuantidade * doublePreco;
+                        String kms = edtKms.getText().toString();
 
                         Abastecimento abastecimento = new Abastecimento();
                         if(!edtPosto.getText().toString().isEmpty()) {
@@ -196,6 +208,7 @@ public class AbastecerActivity extends AppCompatActivity {
                         abastecimento.setCarro(listaCarros.get(spinnerCarro.getSelectedItemPosition()));
                         abastecimento.setData(formattedDate);
                         abastecimento.setQuantidade(doubleQuantidade);
+                        abastecimento.setKms(kms);
                         if (!toggleReal.isChecked()) {
                             abastecimento.setReal("reais");
                             abastecimento.setQtdLitroAbastecida(quantidadeLitroAbastecida);
@@ -216,7 +229,7 @@ public class AbastecerActivity extends AppCompatActivity {
 
                     }
                 }catch(Exception e){
-                    Log.i("Erro ao salvar:", " "+e.toString());
+                    Log.e("Erro ao salvar:", ""+e.getMessage());
                 }
             }
         });
@@ -268,6 +281,50 @@ public class AbastecerActivity extends AppCompatActivity {
         });
     }
 
+    private final TextWatcher currencyTextWatcher = new TextWatcher() {
+        private boolean isFormatting;
+        private boolean isDeleting;
+
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            if (isFormatting || isDeleting) {
+                return;
+            }
+        }
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+            if (isFormatting || isDeleting) {
+                return;
+            }
+
+            isFormatting = true;
+            String formattedValue = formatCurrency(s.toString());
+            edtQuantidade.setText(formattedValue);
+            edtQuantidade.setSelection(formattedValue.length());
+            isFormatting = false;
+        }
+
+        @Override
+        public void afterTextChanged(Editable s) {
+            if (isFormatting || isDeleting) {
+                return;
+            }
+        }
+
+        private String formatCurrency(String value) {
+            String cleanValue = value.replaceAll("[^0-9]", "");
+
+            try {
+                double parsed = Double.parseDouble(cleanValue);
+                String formatted = currencyFormat.format((parsed / 100));
+                return formatted;
+            } catch (NumberFormatException e) {
+                return "";
+            }
+        }
+    };
+
     public void criandoOuAbrindoBancoDeDados(){
 
         try{
@@ -281,7 +338,8 @@ public class AbastecerActivity extends AppCompatActivity {
                     "quantidade DOUBLE," +
                     "real VARCHAR," +
                     "tipo VARCHAR," +
-                    "qtdAbastecida DOUBLE)");
+                    "qtdAbastecida DOUBLE," +
+                    "kms VARCHAR)");
 
         }catch (Exception e){
             e.printStackTrace();
@@ -293,16 +351,16 @@ public class AbastecerActivity extends AppCompatActivity {
 
         try{
 
-            bancoDeDados.execSQL("INSERT INTO abastecimentos(posto, preco, carro, data, quantidade, real, tipo, qtdAbastecida) " +
+            bancoDeDados.execSQL("INSERT INTO abastecimentos(posto, preco, carro, data, quantidade, real, tipo, qtdAbastecida, kms) " +
                     "VALUES ('" +abastecimento.getPosto()+ "', '" +abastecimento.getPreco()+"', '"+abastecimento.getCarro()+"" +
                     "', '"+abastecimento.getData()+"', '"+abastecimento.getQuantidade()+"', '"+abastecimento.getReal()+"'," +
-                    " '"+abastecimento.getTipo()+"', '"+abastecimento.getQtdLitroAbastecida()+"')");
+                    " '"+abastecimento.getTipo()+"', '"+abastecimento.getQtdLitroAbastecida()+"', '"+abastecimento.getKms()+"')");
 
             Toast.makeText(AbastecerActivity.this, "Abastecimento salvo com sucesso!", Toast.LENGTH_LONG).show();
 
         }catch(Exception e){
             e.printStackTrace();
-            Log.i("Erro ", " ao salvar carro: "+e.toString());
+            Log.e("Erro ", " ao salvar carro: "+e.toString());
         }
     }
 
@@ -340,7 +398,7 @@ public class AbastecerActivity extends AppCompatActivity {
             Log.i("Erro ","ao recuperar carros: " + e.toString());
             if(listaCarros == null) {
                 listaCarros = new ArrayList<String>();
-                listaCarros.add("Nenhum Carro Cadastrado");
+                listaCarros.add("Não informado");
             }
         }
     }

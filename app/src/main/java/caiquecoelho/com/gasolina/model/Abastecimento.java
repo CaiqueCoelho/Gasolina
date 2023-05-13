@@ -16,6 +16,7 @@ public class Abastecimento {
     private String carro;
     private String real;
     private double qtdLitroAbastecida;
+    private String kms;
 
     public Abastecimento(){
         posto = "Não informado";
@@ -23,12 +24,19 @@ public class Abastecimento {
         tipo = "Gasolina";
         real = "Litro";
         carro = "Não informado";
+        kms = "";
     }
 
     public String getPosto() { return posto; }
 
     public void setPosto(String posto) {
         this.posto = posto;
+    }
+
+    public String getKms() { return kms; }
+
+    public void setKms(String kms) {
+        this.kms = kms;
     }
 
     public double getPreco() {

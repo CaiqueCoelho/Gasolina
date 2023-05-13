@@ -2,12 +2,14 @@ package caiquecoelho.com.gasolina;
 
 import android.graphics.Rect;
 import android.os.Build;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.TextView;
+
+import org.w3c.dom.Text;
 
 public class DetalhesAbastecimentoActivity extends AppCompatActivity {
 
@@ -18,6 +20,8 @@ public class DetalhesAbastecimentoActivity extends AppCompatActivity {
     private TextView txtLitros;
     private TextView txtTipo;
     private TextView txtTotal;
+    private TextView txtKms;
+    private TextView txtKmsPerLiter;
 
     public static final String TAG = "ImmersiveModeFragment";
 
@@ -63,17 +67,39 @@ public class DetalhesAbastecimentoActivity extends AppCompatActivity {
         txtLitros = (TextView) findViewById(R.id.txtLitros);
         txtTipo = (TextView) findViewById(R.id.txtTipo);
         txtTotal = (TextView) findViewById(R.id.textViewTotal);
+        txtKms = (TextView) findViewById(R.id.txtKms);
+        txtKmsPerLiter = (TextView) findViewById(R.id.txtKmsPerLiter);
 
         Bundle extras = getIntent().getExtras();
         txtPosto.setText(extras.getString("posto"));
         txtData.setText(extras.getString("data"));
         txtPreco.setText(extras.getString("preco"));
-        txtQtde.setText(extras.getString("quantidade") + " " + extras.getString("real"));
+        if(!extras.getString("kms").isEmpty()){
+            txtKms.setText(extras.getString("kms") + " quilômetros");
+        }
+        Double qtdDouble = Double.parseDouble(extras.getString("quantidade"));
+        if(qtdDouble / 100.0 > 1) {
+            qtdDouble = (Double.parseDouble(extras.getString("quantidade")) / 100.0);
+        }
+        txtQtde.setText(qtdDouble.toString().replace(".", ",") + " " + extras.getString("real"));
         if(extras.getString("real").equals("litros")){
             txtTotal.setText("Total Abastecido em Reais");
         }
-        txtLitros.setText(extras.getString("litros"));
+
+        Double litros = Double.parseDouble(extras.getString("litros"));
+        if(Double.parseDouble(extras.getString("litros")) / 100 > 1) {
+            litros = (Double.parseDouble(extras.getString("quantidade")) / 100.0);
+        }
+        txtLitros.setText(litros.toString());
         txtTipo.setText(extras.getString("tipo"));
+
+        Double kmsForLiter = null;
+        try{
+            kmsForLiter =  (Double.parseDouble(extras.getString("lastKms")) - Double.parseDouble(extras.getString("kms")))/ Double.parseDouble(extras.getString("lastLitrosAbastecidos"));
+            txtKmsPerLiter.setText(kmsForLiter.intValue() + " quilômetros por litro");
+        } catch(Exception error){
+            Log.i("kmsForLiter", error.getMessage());
+        }
     }
 
     public void esconderMenuBar(){
