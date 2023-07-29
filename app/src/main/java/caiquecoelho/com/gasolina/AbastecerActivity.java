@@ -31,6 +31,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Locale;
+import java.util.Objects;
 
 import caiquecoelho.com.gasolina.model.Abastecimento;
 
@@ -56,6 +57,10 @@ public class AbastecerActivity extends AppCompatActivity {
     private ArrayAdapter<String> adapterListaCarro;
     private ArrayList<String> listaCarros;
     private ArrayList<Integer> listaIds;
+    private String id;
+    private String update = "0";
+    private int position = -1;
+    private String date = null;
 
     public static Activity activityAbastecer;
 
@@ -136,17 +141,32 @@ public class AbastecerActivity extends AppCompatActivity {
             }
             edtPosto.setText(extras.getString("posto"));
             edtPreco.setText(extras.getString("preco"));
-            edtQuantidade.setText(extras.getString("quantidade"));
-            if(extras.getString("tipo").equals("alcool")){
+            edtQuantidade.setText(extras.getString("quantidade") + "0");
+            Log.i("tipo", extras.getString("tipo"));
+            if(extras.getString("tipo").equals("Álcool")){
                 radioAlcool.setChecked(true);
             }
-            else if(extras.getString("tipo").equals("gasolina")){
+            else if(extras.getString("tipo").equals("Gasolina")){
+                Log.i("tipo gasolina", extras.getString("tipo"));
                 radioGasolina.setChecked(true);
             }
             if(extras.getString("real").equals("litro")){
                 toggleReal.setChecked(true);
             }
+            if (extras.getString("id") != null) {
+                id = extras.getString("id");
+                Log.i("id", id);
+            }
+            if(extras.getString("edit") != null){
+                update = extras.getString("edit");
+                Log.i("update data", update);
+            }
             spinnerCarro.setSelection(listaCarros.size()-1);
+            position = extras.getInt("position", -1);
+            Calendar currentDate = Calendar.getInstance();
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+            String formattedDate = dateFormat.format(currentDate.getTime());
+            date = extras.getString("date", formattedDate);
         }
 
         btnSalvar.setOnClickListener(new View.OnClickListener() {
@@ -349,18 +369,54 @@ public class AbastecerActivity extends AppCompatActivity {
 
     public void salvandoNoBancoDeDados(Abastecimento abastecimento){
 
-        try{
+        if(!Objects.equals(update, "1")){
+            Log.i("Create Abastecimento", "" + update);
+            Log.i("Create Abastecimento", "" + Boolean.getBoolean(update));
 
-            bancoDeDados.execSQL("INSERT INTO abastecimentos(posto, preco, carro, data, quantidade, real, tipo, qtdAbastecida, kms) " +
-                    "VALUES ('" +abastecimento.getPosto()+ "', '" +abastecimento.getPreco()+"', '"+abastecimento.getCarro()+"" +
-                    "', '"+abastecimento.getData()+"', '"+abastecimento.getQuantidade()+"', '"+abastecimento.getReal()+"'," +
-                    " '"+abastecimento.getTipo()+"', '"+abastecimento.getQtdLitroAbastecida()+"', '"+abastecimento.getKms()+"')");
+            try{
 
-            Toast.makeText(AbastecerActivity.this, "Abastecimento salvo com sucesso!", Toast.LENGTH_LONG).show();
+                bancoDeDados.execSQL("INSERT INTO abastecimentos(posto, preco, carro, data, quantidade, real, tipo, qtdAbastecida, kms) " +
+                        "VALUES ('" +abastecimento.getPosto()+ "', '" +abastecimento.getPreco()+"', '"+abastecimento.getCarro()+"" +
+                        "', '"+abastecimento.getData()+"', '"+abastecimento.getQuantidade()+"', '"+abastecimento.getReal()+"'," +
+                        " '"+abastecimento.getTipo()+"', '"+abastecimento.getQtdLitroAbastecida()+"', '"+abastecimento.getKms()+"')");
 
-        }catch(Exception e){
-            e.printStackTrace();
-            Log.e("Erro ", " ao salvar carro: "+e.toString());
+                Toast.makeText(AbastecerActivity.this, "Abastecimento criado com sucesso!", Toast.LENGTH_LONG).show();
+
+            }catch(Exception e){
+                e.printStackTrace();
+                Log.e("Erro ", " ao salvar carro: "+e.toString());
+            }
+        } else{
+            Log.i("Update Abastecimento", "doing update");
+
+            try{
+
+                String updateQuery = "UPDATE abastecimentos SET posto = '" + abastecimento.getPosto() + "', " +
+                        "preco = '" + abastecimento.getPreco() + "', " +
+                        "carro = '" + abastecimento.getCarro() + "', " +
+                        "data = '" + date + "', " +
+                        "quantidade = '" + abastecimento.getQuantidade() + "', " +
+                        "real = '" + abastecimento.getReal() + "', " +
+                        "tipo = '" + abastecimento.getTipo() + "', " +
+                        "qtdAbastecida = '" + abastecimento.getQtdLitroAbastecida() + "', " +
+                        "kms = '" + abastecimento.getKms() + "'" +
+                        "WHERE id = " + id;
+
+                bancoDeDados.execSQL(updateQuery);
+
+                Toast.makeText(AbastecerActivity.this, "Abastecimento atualizado com sucesso!", Toast.LENGTH_LONG).show();
+
+                HistoricoActivity.history.finish();
+                DetalhesAbastecimentoActivity.details.finish();
+                Intent history = new Intent(AbastecerActivity.this, HistoricoActivity.class);
+                history.putExtra("update", "1");
+                history.putExtra("position", position);
+                startActivity(history);
+
+            }catch(Exception e){
+                e.printStackTrace();
+                Log.e("Erro ", " ao salvar carro: "+e.toString());
+            }
         }
     }
 

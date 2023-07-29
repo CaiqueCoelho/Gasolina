@@ -167,4 +167,16 @@
         android:text=""
         android:textSize="@dimen/abastecer_size" />
 
+    <Button
+        android:id="@+id/btnEdit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/textViewTotal"
+        android:layout_alignStart="@+id/textViewTotal"
+        android:layout_below="@+id/txtKmsPerLiter"
+        android:layout_marginTop="20dp"
+        android:background="@color/colorPrimaryOrange"
+        android:textColor="@color/white"
+        android:text="Editar"
+        ></Button>
 </RelativeLayout>

@@ -1,5 +1,6 @@
 package caiquecoelho.com.gasolina;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -48,6 +49,10 @@ public class HistoricoActivity extends AppCompatActivity {
     public static final String TAG = "ImmersiveModeFragment";
 
     public int flag = 1;
+    private String update = "0";
+    private int positionUpdate = -1;
+
+    public static Activity history;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +60,14 @@ public class HistoricoActivity extends AppCompatActivity {
         setContentView(R.layout.activity_historico);
 
         fullScreen();
+
+        history = this;
+
+        Bundle extras = getIntent().getExtras();
+        if(extras != null){
+            positionUpdate = extras.getInt("position", -1);
+            update = extras.getString("update", "0");
+        }
 
         final View contentView = findViewById(R.id.rootView);
         contentView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
@@ -95,61 +108,73 @@ public class HistoricoActivity extends AppCompatActivity {
 
         carregandoAbastecimentos();
 
+        if(update.equals("1")){
+            Intent intentDetalhes = HistoricoActivity.this.getIntent(positionUpdate);
+            startActivity(intentDetalhes);
+        }
+
         listView.setClickable(true);
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 try {
-                    String posto = listaPostos.get(position);
-                    String data = listaDatas.get(position);
-                    String preco = listaPrecos.get(position);
-                    String tipo = listaTipos.get(position);
-                    String quantidadeAbastecida = listaQuantidades.get(position);
-                    String litrosAbatecido = listaLitros.get(position);
-                    String kms = listaKms.get(position);
-                    String real = listaReal.get(position);
-                    String lastKms = null;
-                    String lastLitrosAbastecidos = null;
-                    try{
-                        lastKms = listaKms.get(position-1);
-                    } catch (Exception error) {
-                        Log.e("Error geting next kms", error.getMessage());
-                    }
-
-                    try{
-                        lastLitrosAbastecidos = listaLitros.get(position-1);
-                    } catch (Exception error) {
-                        Log.e("Error geting next litrs", error.getMessage());
-                    }
-
-                    Intent intentDetalhes = new Intent(HistoricoActivity.this, DetalhesAbastecimentoActivity.class);
-                    intentDetalhes.putExtra("posto", posto);
-                    intentDetalhes.putExtra("data", data);
-                    intentDetalhes.putExtra("preco", preco);
-                    intentDetalhes.putExtra("tipo", tipo);
-                    intentDetalhes.putExtra("quantidade", quantidadeAbastecida);
-                    intentDetalhes.putExtra("litros", litrosAbatecido);
-                    intentDetalhes.putExtra("kms", kms);
-                    intentDetalhes.putExtra("real", real);
-                    try{
-                        intentDetalhes.putExtra("lastKms", lastKms);
-                    } catch (Exception error) {
-                        Log.e("Error geting next kms", error.getMessage());
-                    }
-
-                    try{
-                        intentDetalhes.putExtra("lastLitrosAbastecidos", lastLitrosAbastecidos);
-                    } catch (Exception error) {
-                        Log.e("Error geting next litrs", error.getMessage());
-                    }
-
+                    Intent intentDetalhes = HistoricoActivity.this.getIntent(position);
                     startActivity(intentDetalhes);
                 }catch (Exception e){
                     Log.i("Erro ", "ao abir detlahes:" +e.toString());
                 }
             }
         });
+    }
+
+    private Intent getIntent(int position) {
+        String idAbastecimento = listaIds.get(position).toString();
+        String posto = listaPostos.get(position);
+        String data = listaDatas.get(position);
+        String preco = listaPrecos.get(position);
+        String tipo = listaTipos.get(position);
+        String quantidadeAbastecida = listaQuantidades.get(position);
+        String litrosAbatecido = listaLitros.get(position);
+        String kms = listaKms.get(position);
+        String real = listaReal.get(position);
+        String lastKms = null;
+        String lastLitrosAbastecidos = null;
+        try{
+            lastKms = listaKms.get(position -1);
+        } catch (Exception error) {
+            Log.e("Error geting next kms", error.getMessage());
+        }
+
+        try{
+            lastLitrosAbastecidos = listaLitros.get(position -1);
+        } catch (Exception error) {
+            Log.e("Error geting next litrs", error.getMessage());
+        }
+
+        Intent intentDetalhes = new Intent(HistoricoActivity.this, DetalhesAbastecimentoActivity.class);
+        intentDetalhes.putExtra("posto", posto);
+        intentDetalhes.putExtra("data", data);
+        intentDetalhes.putExtra("preco", preco);
+        intentDetalhes.putExtra("tipo", tipo);
+        intentDetalhes.putExtra("quantidade", quantidadeAbastecida);
+        intentDetalhes.putExtra("litros", litrosAbatecido);
+        intentDetalhes.putExtra("kms", kms);
+        intentDetalhes.putExtra("real", real);
+        intentDetalhes.putExtra("id", idAbastecimento);
+        intentDetalhes.putExtra("position", position);
+        try{
+            intentDetalhes.putExtra("lastKms", lastKms);
+        } catch (Exception error) {
+            Log.e("Error geting next kms", error.getMessage());
+        }
+
+        try{
+            intentDetalhes.putExtra("lastLitrosAbastecidos", lastLitrosAbastecidos);
+        } catch (Exception error) {
+            Log.e("Error geting next litrs", error.getMessage());
+        }
+        return intentDetalhes;
     }
 
     public void recuperandoAbastecimentos(){

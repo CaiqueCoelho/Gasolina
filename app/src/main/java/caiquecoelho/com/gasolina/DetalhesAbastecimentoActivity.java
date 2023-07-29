@@ -1,5 +1,7 @@
 package caiquecoelho.com.gasolina;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Rect;
 import android.os.Build;
 import androidx.appcompat.app.AppCompatActivity;
@@ -7,9 +9,12 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewTreeObserver;
+import android.widget.Button;
 import android.widget.TextView;
 
 import org.w3c.dom.Text;
+
+import caiquecoelho.com.gasolina.model.Carro;
 
 public class DetalhesAbastecimentoActivity extends AppCompatActivity {
 
@@ -22,8 +27,12 @@ public class DetalhesAbastecimentoActivity extends AppCompatActivity {
     private TextView txtTotal;
     private TextView txtKms;
     private TextView txtKmsPerLiter;
+    private Button btnEdit;
+    private String id = null;
+    private int position = -1;
 
     public static final String TAG = "ImmersiveModeFragment";
+    public static Activity details;
 
     public int flag = 0;
 
@@ -33,6 +42,7 @@ public class DetalhesAbastecimentoActivity extends AppCompatActivity {
         setContentView(R.layout.activity_detalhes_abastecimento);
 
         fullScreen();
+        details = this;
 
         final View contentView = findViewById(R.id.rootView);
         contentView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
@@ -69,6 +79,7 @@ public class DetalhesAbastecimentoActivity extends AppCompatActivity {
         txtTotal = (TextView) findViewById(R.id.textViewTotal);
         txtKms = (TextView) findViewById(R.id.txtKms);
         txtKmsPerLiter = (TextView) findViewById(R.id.txtKmsPerLiter);
+        btnEdit = (Button) findViewById(R.id.btnEdit);
 
         Bundle extras = getIntent().getExtras();
         txtPosto.setText(extras.getString("posto"));
@@ -78,18 +89,18 @@ public class DetalhesAbastecimentoActivity extends AppCompatActivity {
             txtKms.setText(extras.getString("kms") + " quilômetros");
         }
         Double qtdDouble = Double.parseDouble(extras.getString("quantidade"));
-        if(qtdDouble / 100.0 > 1) {
-            qtdDouble = (Double.parseDouble(extras.getString("quantidade")) / 100.0);
-        }
+//        if(qtdDouble / 100.0 > 1) {
+//            qtdDouble = (Double.parseDouble(extras.getString("quantidade")) / 100.0);
+//        }
         txtQtde.setText(qtdDouble.toString().replace(".", ",") + " " + extras.getString("real"));
         if(extras.getString("real").equals("litros")){
             txtTotal.setText("Total Abastecido em Reais");
         }
 
         Double litros = Double.parseDouble(extras.getString("litros"));
-        if(Double.parseDouble(extras.getString("litros")) / 100 > 1) {
-            litros = (Double.parseDouble(extras.getString("quantidade")) / 100.0);
-        }
+//        if(Double.parseDouble(extras.getString("litros")) / 100 > 1) {
+//            litros = (Double.parseDouble(extras.getString("quantidade")) / 100.0);
+//        }
         txtLitros.setText(litros.toString());
         txtTipo.setText(extras.getString("tipo"));
 
@@ -100,6 +111,33 @@ public class DetalhesAbastecimentoActivity extends AppCompatActivity {
         } catch(Exception error){
             Log.i("kmsForLiter", error.getMessage());
         }
+
+        id = extras.getString("id");
+        position = extras.getInt("position", -1);
+
+        Double finalQtdDouble = qtdDouble;
+        btnEdit.setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+                Intent intentEdit = new Intent(DetalhesAbastecimentoActivity.this, AbastecerActivity.class);
+                intentEdit.putExtra("posto", extras.getString("posto"));
+                intentEdit.putExtra("kms", extras.getString("kms"));
+                intentEdit.putExtra("preco", extras.getString("preco"));
+                intentEdit.putExtra("quantidade", finalQtdDouble.toString());
+                intentEdit.putExtra("tipo", extras.getString("tipo"));
+                intentEdit.putExtra("real", extras.getString("real"));
+                intentEdit.putExtra("carro", extras.getString("carro"));
+                intentEdit.putExtra("edit", "1");
+                intentEdit.putExtra("date", extras.getString("data"));
+                intentEdit.putExtra("position", position);
+                intentEdit.putExtra("id", id);
+                intentEdit.putExtra("id", id);
+                DetalhesAbastecimentoActivity.this.finish();
+                startActivity(intentEdit);
+                finish();
+            }
+        }
+        );
     }
 
     public void esconderMenuBar(){
