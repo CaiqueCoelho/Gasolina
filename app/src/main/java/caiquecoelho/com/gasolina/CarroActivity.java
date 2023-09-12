@@ -68,13 +68,17 @@ public class CarroActivity extends AppCompatActivity {
         edtApelido = (EditText) findViewById(R.id.edtApelido);
         btnSalvar = (Button) findViewById(R.id.btnSalvar);
         txtErroMarca = (TextView) findViewById(R.id.txtErroMarca);
+        Bundle extras = getIntent().getExtras();
 
-        final Intent intent = getIntent();
-        final String posto = intent.getStringExtra("posto");
-        final String preco = intent.getStringExtra("preco");
-        final String quantidade = intent.getStringExtra("quantidade");
-        final String tipo = intent.getStringExtra("tipo");
-        final String real = intent.getStringExtra("real");
+        final String posto = extras.getString("posto");
+        final String preco = extras.getString("preco");
+        final String quantidade = extras.getString("quantidade");
+        final String tipo = extras.getString("tipo");
+        final String real = extras.getString("real");
+        final String kms = extras.getString("kms");
+        final String position = extras.getString("position");
+        final String date = extras.getString("date");
+        final String timestamp = extras.getString("timestamp");
 
         btnSalvar.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -95,7 +99,25 @@ public class CarroActivity extends AppCompatActivity {
                     intentAbastecimento.putExtra("quantidade", quantidade);
                     intentAbastecimento.putExtra("tipo", tipo);
                     intentAbastecimento.putExtra("real", real);
-                    //intentAbastecimento.putExtra("carro", carro);
+                    intentAbastecimento.putExtra("kms", kms);
+                    intentAbastecimento.putExtra("position", position);
+                    intentAbastecimento.putExtra("date", date);
+                    intentAbastecimento.putExtra("timestamp", timestamp);
+                    if (extras.getString("edit") != null) {
+                        Log.i("update data 1", extras.getString("edit"));
+                        intentAbastecimento.putExtra("edit", extras.getString("edit"));
+                    }
+                    if (extras.getString("idFuelling") != null) {
+                        Log.i("idFuelling", extras.getString("idFuelling"));
+                        intentAbastecimento.putExtra("idFuelling", extras.getString("idFuelling"));
+                    }
+                    // intentAbastecimento.putExtra("car_activity", 1);
+
+                    Bundle extras = getIntent().getExtras();
+                    if(extras != null && extras.getString("user_id") != null) {
+                        intentAbastecimento.putExtra("user_id", extras.getString("user_id"));
+                    }
+                    intentAbastecimento.putExtra("carro", carro.getApelido());
                     AbastecerActivity.activityAbastecer.finish();
                     startActivity(intentAbastecimento);
                     finish();
@@ -127,47 +149,6 @@ public class CarroActivity extends AppCompatActivity {
         } catch (Exception e) {
             e.printStackTrace();
             Log.i("Erro ", "ao salvar carro:" + e.toString());
-        }
-    }
-
-    public void esconderMenuBar(){
-        if(flag == 1) {
-            // The UI options currently enabled are represented by a bitfield.
-            // getSystemUiVisibility() gives us that bitfield.
-            int uiOptions = this.getWindow().getDecorView().getSystemUiVisibility();
-            int newUiOptions = uiOptions;
-            boolean isImmersiveModeEnabled =
-                    ((uiOptions | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY) == uiOptions);
-            if (isImmersiveModeEnabled) {
-                Log.i(TAG, "Turning immersive mode mode off. ");
-            } else {
-                Log.i(TAG, "Turning immersive mode mode on.");
-            }
-
-            // Navigation bar hiding:  Backwards compatible to ICS.
-            if (Build.VERSION.SDK_INT >= 14) {
-                newUiOptions ^= View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
-            }
-
-            // Status bar hiding: Backwards compatible to Jellybean
-            if (Build.VERSION.SDK_INT >= 16) {
-                newUiOptions ^= View.SYSTEM_UI_FLAG_FULLSCREEN;
-            }
-
-            // Immersive mode: Backward compatible to KitKat.
-            // Note that this flag doesn't do anything by itself, it only augments the behavior
-            // of HIDE_NAVIGATION and FLAG_FULLSCREEN.  For the purposes of this sample
-            // all three flags are being toggled together.
-            // Note that there are two immersive mode UI flags, one of which is referred to as "sticky".
-            // Sticky immersive mode differs in that it makes the navigation and status bars
-            // semi-transparent, and the UI flag does not get cleared when the user interacts with
-            // the screen.
-            if (Build.VERSION.SDK_INT >= 18) {
-                newUiOptions ^= View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
-            }
-
-            this.getWindow().getDecorView().setSystemUiVisibility(newUiOptions);
-            flag = 0;
         }
     }
 

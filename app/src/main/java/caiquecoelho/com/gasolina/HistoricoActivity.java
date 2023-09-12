@@ -42,6 +42,8 @@ public class HistoricoActivity extends AppCompatActivity {
     private ArrayList<String> listaTipos;
     private ArrayList<String> listaLitros;
     private ArrayList<String> listaKms;
+
+    private ArrayList<String> listTimestamp;
     private ArrayList<String> listaAbastecimentos;
 
     private ArrayAdapter<String> arrayAdapter;
@@ -53,6 +55,7 @@ public class HistoricoActivity extends AppCompatActivity {
     private int positionUpdate = -1;
 
     public static Activity history;
+    private String userId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,10 +111,12 @@ public class HistoricoActivity extends AppCompatActivity {
 
         carregandoAbastecimentos();
 
+        /*
         if(update.equals("1")){
             Intent intentDetalhes = HistoricoActivity.this.getIntent(positionUpdate);
             startActivity(intentDetalhes);
         }
+        */
 
         listView.setClickable(true);
 
@@ -119,10 +124,11 @@ public class HistoricoActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 try {
+                    Log.i("carro-extra", listaCarros.get(position));
                     Intent intentDetalhes = HistoricoActivity.this.getIntent(position);
                     startActivity(intentDetalhes);
                 }catch (Exception e){
-                    Log.i("Erro ", "ao abir detlahes:" +e.toString());
+                    Log.i("Erro ", "ao abir detlahes:" +e.getMessage());
                 }
             }
         });
@@ -130,6 +136,7 @@ public class HistoricoActivity extends AppCompatActivity {
 
     private Intent getIntent(int position) {
         String idAbastecimento = listaIds.get(position).toString();
+        String carro = listaCarros.get(position);
         String posto = listaPostos.get(position);
         String data = listaDatas.get(position);
         String preco = listaPrecos.get(position);
@@ -137,6 +144,7 @@ public class HistoricoActivity extends AppCompatActivity {
         String quantidadeAbastecida = listaQuantidades.get(position);
         String litrosAbatecido = listaLitros.get(position);
         String kms = listaKms.get(position);
+        String timestamp = listTimestamp.get(position);
         String real = listaReal.get(position);
         String lastKms = null;
         String lastLitrosAbastecidos = null;
@@ -152,6 +160,11 @@ public class HistoricoActivity extends AppCompatActivity {
             Log.e("Error geting next litrs", error.getMessage());
         }
 
+        Bundle extras = getIntent().getExtras();
+        if(extras != null) {
+            userId = extras.getString("user_id", null);
+        }
+
         Intent intentDetalhes = new Intent(HistoricoActivity.this, DetalhesAbastecimentoActivity.class);
         intentDetalhes.putExtra("posto", posto);
         intentDetalhes.putExtra("data", data);
@@ -161,8 +174,12 @@ public class HistoricoActivity extends AppCompatActivity {
         intentDetalhes.putExtra("litros", litrosAbatecido);
         intentDetalhes.putExtra("kms", kms);
         intentDetalhes.putExtra("real", real);
-        intentDetalhes.putExtra("id", idAbastecimento);
+        intentDetalhes.putExtra("idFuelling", idAbastecimento);
         intentDetalhes.putExtra("position", position);
+        Log.i("Historico-Timestamp", timestamp);
+        intentDetalhes.putExtra("timestamp", timestamp);
+        intentDetalhes.putExtra("user_id", userId);
+        intentDetalhes.putExtra("carro", carro);
         try{
             intentDetalhes.putExtra("lastKms", lastKms);
         } catch (Exception error) {
@@ -195,6 +212,7 @@ public class HistoricoActivity extends AppCompatActivity {
             int idColunaTipo = cursor.getColumnIndex("tipo");
             int idColunaLitros = cursor.getColumnIndex("qtdAbastecida");
             int idKms = cursor.getColumnIndex("kms");
+            int idTimestamp = cursor.getColumnIndex("timestamp");
 
             //Criando adaptadores e listas
             listaIds = new ArrayList<Integer>();
@@ -207,6 +225,7 @@ public class HistoricoActivity extends AppCompatActivity {
             listaTipos = new ArrayList<String>();
             listaLitros = new ArrayList<String>();
             listaKms = new ArrayList<String>();
+            listTimestamp = new ArrayList<String>();
 
             listaAbastecimentos = new ArrayList<String>();
 
@@ -231,11 +250,12 @@ public class HistoricoActivity extends AppCompatActivity {
 
                 Double qtdDouble = null;
                 String quantidade = cursor.getString(idColunaQtde);
-                if(Double.parseDouble(quantidade) / 100.0 > 1) {
-                    qtdDouble = (Double.parseDouble(quantidade) / 100.0);
-                } else {
-                    qtdDouble = Double.parseDouble(quantidade);
-                }
+//                if(Double.parseDouble(quantidade) / 100.0 > 1) {
+//                    qtdDouble = (Double.parseDouble(quantidade) / 100.0);
+//                } else {
+//                    qtdDouble = Double.parseDouble(quantidade);
+//                }
+                qtdDouble = Double.parseDouble(quantidade);
                 listaQuantidades.add(quantidade);
 
                 String real = cursor.getString(idColunaReal);
@@ -252,6 +272,10 @@ public class HistoricoActivity extends AppCompatActivity {
                 String kms = cursor.getString(idKms);
                 Log.i("kms", ""+kms);
                 listaKms.add(kms);
+
+                String timestampGet = cursor.getString(idTimestamp);
+                listTimestamp.add(timestampGet);
+                Log.i("listTimestamp", timestampGet);
 
                 String abastecimento = "Carro: " +carro+ ", Abastecido: " +qtdDouble.toString().replace(".", ",")+ " " +real;
                 listaAbastecimentos.add(abastecimento);
@@ -295,7 +319,7 @@ public class HistoricoActivity extends AppCompatActivity {
 
         }catch(Exception e){
             e.printStackTrace();
-            Log.e("Erro ", "ao listar abastecimentos: " +e.toString());
+            Log.e("Erro ", "ao listar abastecimentos: " +e.getMessage());
             if(listaAbastecimentos == null){
                 listaAbastecimentos = new ArrayList<String>();
                 listaAbastecimentos.add("Nenhum abastecimento registrado");

@@ -28,7 +28,7 @@ public class DetalhesAbastecimentoActivity extends AppCompatActivity {
     private TextView txtKms;
     private TextView txtKmsPerLiter;
     private Button btnEdit;
-    private String id = null;
+    private String idFuelling = null;
     private int position = -1;
 
     public static final String TAG = "ImmersiveModeFragment";
@@ -112,7 +112,7 @@ public class DetalhesAbastecimentoActivity extends AppCompatActivity {
             Log.i("kmsForLiter", error.getMessage());
         }
 
-        id = extras.getString("id");
+        idFuelling = extras.getString("idFuelling");
         position = extras.getInt("position", -1);
 
         Double finalQtdDouble = qtdDouble;
@@ -126,12 +126,14 @@ public class DetalhesAbastecimentoActivity extends AppCompatActivity {
                 intentEdit.putExtra("quantidade", finalQtdDouble.toString());
                 intentEdit.putExtra("tipo", extras.getString("tipo"));
                 intentEdit.putExtra("real", extras.getString("real"));
+                Log.i("carro-extra", extras.getString("carro"));
                 intentEdit.putExtra("carro", extras.getString("carro"));
                 intentEdit.putExtra("edit", "1");
                 intentEdit.putExtra("date", extras.getString("data"));
                 intentEdit.putExtra("position", position);
-                intentEdit.putExtra("id", id);
-                intentEdit.putExtra("id", id);
+                intentEdit.putExtra("timestamp", extras.getString("timestamp"));
+                intentEdit.putExtra("user_id", extras.getString("user_id"));
+                intentEdit.putExtra("idFuelling", idFuelling);
                 DetalhesAbastecimentoActivity.this.finish();
                 startActivity(intentEdit);
                 finish();

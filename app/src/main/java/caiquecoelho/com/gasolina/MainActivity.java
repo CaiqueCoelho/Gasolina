@@ -36,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView btnHistorico;
     private TextView txtErroGasolina;
     private TextView txtErroAlcool;
+    private String userId;
 
     public static final String FRAGTAG = "ImmersiveModeFragment";
     public static final String TAG = "ImmersiveModeFragment";
@@ -89,6 +90,10 @@ public class MainActivity extends AppCompatActivity {
         MaskTextWatcher mtwAlcool = new MaskTextWatcher(edtAlcool , smfAlcool);
         edtAlcool.addTextChangedListener(mtwAlcool);
 
+        Bundle extras = getIntent().getExtras();
+        if(extras != null){
+            userId = extras.getString("user_id");
+        }
 
         btnCalcular.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -169,6 +174,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, AbastecerActivity.class);
+                intent.putExtra("user_id", userId);
                 startActivity(intent);
             }
         });
@@ -176,51 +182,12 @@ public class MainActivity extends AppCompatActivity {
         btnHistorico.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(MainActivity.this, HistoricoActivity.class));
+                Intent intent = new Intent(MainActivity.this, HistoricoActivity.class);
+                intent.putExtra("user_id", userId);
+                startActivity(intent);
             }
         });
 
-    }
-
-    public void esconderMenuBar(){
-        if(flag == 1) {
-            // The UI options currently enabled are represented by a bitfield.
-            // getSystemUiVisibility() gives us that bitfield.
-            int uiOptions = this.getWindow().getDecorView().getSystemUiVisibility();
-            int newUiOptions = uiOptions;
-            boolean isImmersiveModeEnabled =
-                    ((uiOptions | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY) == uiOptions);
-            if (isImmersiveModeEnabled) {
-                Log.i(TAG, "Turning immersive mode mode off. ");
-            } else {
-                Log.i(TAG, "Turning immersive mode mode on.");
-            }
-
-            // Navigation bar hiding:  Backwards compatible to ICS.
-            if (Build.VERSION.SDK_INT >= 14) {
-                newUiOptions ^= View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
-            }
-
-            // Status bar hiding: Backwards compatible to Jellybean
-            if (Build.VERSION.SDK_INT >= 16) {
-                newUiOptions ^= View.SYSTEM_UI_FLAG_FULLSCREEN;
-            }
-
-            // Immersive mode: Backward compatible to KitKat.
-            // Note that this flag doesn't do anything by itself, it only augments the behavior
-            // of HIDE_NAVIGATION and FLAG_FULLSCREEN.  For the purposes of this sample
-            // all three flags are being toggled together.
-            // Note that there are two immersive mode UI flags, one of which is referred to as "sticky".
-            // Sticky immersive mode differs in that it makes the navigation and status bars
-            // semi-transparent, and the UI flag does not get cleared when the user interacts with
-            // the screen.
-            if (Build.VERSION.SDK_INT >= 18) {
-                newUiOptions ^= View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
-            }
-
-            this.getWindow().getDecorView().setSystemUiVisibility(newUiOptions);
-            flag = 0;
-        }
     }
 
     public void fullScreen() {

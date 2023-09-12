@@ -17,6 +17,7 @@ public class Abastecimento {
     private String real;
     private double qtdLitroAbastecida;
     private String kms;
+    private String timestamp;
 
     public Abastecimento(){
         posto = "Não informado";
@@ -27,11 +28,28 @@ public class Abastecimento {
         kms = "";
     }
 
+    public Abastecimento(String posto, double preco, String data, String tipo, double quantidade, String carro, String real, double qtdLitroAbastecida, String kms, String timestamp){
+        this.posto = posto;
+        this.preco = preco;
+        this.data = data;
+        this.tipo = tipo;
+        this.quantidade = quantidade;
+        this.real = real;
+        this.carro = carro;
+        this.qtdLitroAbastecida = qtdLitroAbastecida;
+        this.kms = kms;
+        this.timestamp = timestamp;
+    }
+
     public String getPosto() { return posto; }
 
     public void setPosto(String posto) {
         this.posto = posto;
     }
+
+    public String getTimestamp() {return timestamp;}
+
+    public void setTimestamp(String timestamp) { this.timestamp = timestamp; }
 
     public String getKms() { return kms; }
 

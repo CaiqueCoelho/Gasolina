@@ -1,0 +1,64 @@
+{
+  "project_info": {
+    "project_number": "275153190289",
+    "firebase_url": "https://gasolina-c2624-default-rtdb.firebaseio.com",
+    "project_id": "gasolina-c2624",
+    "storage_bucket": "gasolina-c2624.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:275153190289:android:88c656893a602bc8ae2e30",
+        "android_client_info": {
+          "package_name": "caiquecoelho.com.br.gasolina"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "275153190289-5i7gntdapcek9m805ri9lggjbeehcr06.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "caiquecoelho.com.br.gasolina",
+            "certificate_hash": "65bfe034a9aaf4e69ef20bb34ff998bac16f38a8"
+          }
+        },
+        {
+          "client_id": "275153190289-c1bnlgvdpk9v5e3ala2vvlosloj28i6d.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "caiquecoelho.com.br.gasolina",
+            "certificate_hash": "22187b5b06585519bcf1234f31e615235d046ee9"
+          }
+        },
+        {
+          "client_id": "275153190289-ct6jqromcga7d3270u1a70t5un4b9gpv.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "caiquecoelho.com.br.gasolina",
+            "certificate_hash": "ecf27c67acc4f58e858acc34f2707115ced2de59"
+          }
+        },
+        {
+          "client_id": "275153190289-k91m7cmfhertqieouptvpok247kmgqkd.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBSpiFOXulP2hANkAUIcPq82gbYC6YRwaE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "275153190289-k91m7cmfhertqieouptvpok247kmgqkd.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -25,11 +25,15 @@ import android.widget.ToggleButton;
 
 import com.github.rtoshiro.util.format.SimpleMaskFormatter;
 import com.github.rtoshiro.util.format.text.MaskTextWatcher;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
 import java.util.Objects;
 
@@ -57,7 +61,7 @@ public class AbastecerActivity extends AppCompatActivity {
     private ArrayAdapter<String> adapterListaCarro;
     private ArrayList<String> listaCarros;
     private ArrayList<Integer> listaIds;
-    private String id;
+    private String idFuelling;
     private String update = "0";
     private int position = -1;
     private String date = null;
@@ -67,6 +71,11 @@ public class AbastecerActivity extends AppCompatActivity {
     public static final String TAG = "ImmersiveModeFragment";
 
     public int flag = 0;
+    private String userId;
+    private DatabaseReference myRef;
+
+    private Date currentDate;
+    private String timestamp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,6 +87,20 @@ public class AbastecerActivity extends AppCompatActivity {
         edtQuantidade.addTextChangedListener(currencyTextWatcher);
 
         fullScreen();
+
+        Bundle extras = getIntent().getExtras();
+        if(extras != null) {
+            userId = extras.getString("user_id", null);
+        }
+
+        Log.i("Login-auth-abastecer", Objects.requireNonNullElse(userId, "userId is null"));
+
+        try{
+            FirebaseDatabase database = FirebaseDatabase.getInstance();
+            myRef = database.getReference();
+        } catch(Exception error){
+            Log.e("BreakAbastecer", error.getMessage());
+        }
 
         final View contentView = findViewById(R.id.rootView);
         contentView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
@@ -107,13 +130,15 @@ public class AbastecerActivity extends AppCompatActivity {
 
         setTitle("Registrar Abastecimento");
 
+        Log.i("BreakAbastecer", "Before criandoOuAbrindoBancoDeDadosCarro");
+        criandoOuAbrindoBancoDeDadosCarro();
+        Log.i("BreakAbastecer", "Before criandoOuAbrindoBancoDeDados");
         criandoOuAbrindoBancoDeDados();
+        Log.i("BreakAbastecer", "After criandoOuAbrindoBancoDeDados");
 
         edtPosto = (EditText) findViewById(R.id.edtPosto);
         edtPreco = (EditText) findViewById(R.id.edtPreco);
         edtKms = (EditText) findViewById(R.id.edtKMs);
-        // edtQuantidade = (MaskEditText) findViewById(R.id.edtQuantidadeNew);
-        //edtQuantidade = (CurrencyEditText) findViewById(R.id.edtQuantidade);
         radioAlcool = (RadioButton) findViewById(R.id.radioAlcool);
         radioGasolina = (RadioButton) findViewById(R.id.radioGasolina);
         radioGroup = (RadioGroup) findViewById(R.id.radioGroup);
@@ -125,43 +150,79 @@ public class AbastecerActivity extends AppCompatActivity {
         btnSalvar = (ImageView) findViewById(R.id.btnSalvar);
         btnNovoCarro = (ImageView) findViewById(R.id.btnNovoCarro);
 
-        //edtQuantidade.setMonetaryDivider(',');
-
         SimpleMaskFormatter smfPreco = new SimpleMaskFormatter("N,NN");
         MaskTextWatcher mtwPreco = new MaskTextWatcher(edtPreco, smfPreco);
         edtPreco.addTextChangedListener(mtwPreco);
 
-        Bundle extras = getIntent().getExtras();
+        Log.i("BreakAbastecer", "Before carregandoListaCarros");
         carregandoListaCarros();
+        Log.i("BreakAbastecer", "After carregandoListaCarros");
 
-
-        if(extras != null){
-            if(!extras.getString("kms").isEmpty()){
+        if(extras != null) {
+            if(extras.getString("kms") != null){
                 edtKms.setText(extras.getString("kms"));
             }
-            edtPosto.setText(extras.getString("posto"));
-            edtPreco.setText(extras.getString("preco"));
-            edtQuantidade.setText(extras.getString("quantidade") + "0");
-            Log.i("tipo", extras.getString("tipo"));
-            if(extras.getString("tipo").equals("Álcool")){
-                radioAlcool.setChecked(true);
+            if(extras.getString("posto") != null){
+                edtPosto.setText(extras.getString("posto"));
             }
-            else if(extras.getString("tipo").equals("Gasolina")){
-                Log.i("tipo gasolina", extras.getString("tipo"));
-                radioGasolina.setChecked(true);
+            if(extras.getString("preco") != null){
+                edtPreco.setText(extras.getString("preco"));
             }
-            if(extras.getString("real").equals("litro")){
-                toggleReal.setChecked(true);
+            /*
+            if(extras.getInt("car_activity") == 1){
+                Log.i("car_activity", "1");
+                if(extras.getString("quantidade") != null){
+                    edtQuantidade.setText(extras.getString("quantidade"));
+                }
             }
-            if (extras.getString("id") != null) {
-                id = extras.getString("id");
-                Log.i("id", id);
+            else if(extras.getString("quantidade") != null){
+                Log.i("car_activity", "0");
+                edtQuantidade.setText(extras.getString("quantidade"));
+            }*/
+            if(extras.getString("quantidade") != null){
+                edtQuantidade.setText(extras.getString("quantidade"));
             }
-            if(extras.getString("edit") != null){
+
+            if(extras.getString("tipo") != null){
+                Log.i("tipo", extras.getString("tipo"));
+                if (extras.getString("tipo").equals("Álcool") || extras.getString("tipo").equals("alcool")) {
+                    radioAlcool.setChecked(true);
+                } else if (extras.getString("tipo").equals("Gasolina") || extras.getString("tipo").equals("gasolina")) {
+                    Log.i("tipo gasolina", extras.getString("tipo"));
+                    radioGasolina.setChecked(true);
+                }
+            }
+            if(extras.getString("real") != null){
+                if (extras.getString("real").equals("litro")) {
+                    toggleReal.setChecked(true);
+                }
+            }
+
+            if (extras.getString("idFuelling") != null) {
+                idFuelling = extras.getString("idFuelling");
+                Log.i("idFuelling", idFuelling);
+            }
+            if (extras.getString("edit") != null) {
                 update = extras.getString("edit");
                 Log.i("update data", update);
             }
-            spinnerCarro.setSelection(listaCarros.size()-1);
+
+            if (extras.getString("timestamp") != null) {
+                timestamp = extras.getString("timestamp");
+                Log.i("timestamp", timestamp);
+            }
+
+            Log.i("BreakAbastecer", "Before get carro");
+            if(extras.getString("carro") != null){
+                Log.i("selectedCar", extras.getString("carro"));
+                Log.i("carro-extra", listaCarros.toString());
+                int position = listaCarros.indexOf(extras.getString("carro"));
+                if (position != -1) {
+                    spinnerCarro.setSelection(position);
+                }
+            } else {
+                spinnerCarro.setSelection(listaCarros.size() - 1);
+            }
             position = extras.getInt("position", -1);
             Calendar currentDate = Calendar.getInstance();
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
@@ -175,9 +236,20 @@ public class AbastecerActivity extends AppCompatActivity {
 
                 try {
 
-                    Calendar currentDate = Calendar.getInstance();
+                    Calendar currentDateCalendarInstance = Calendar.getInstance();
                     SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
-                    String formattedDate = dateFormat.format(currentDate.getTime());
+                    String formattedDate = dateFormat.format(currentDateCalendarInstance.getTime());
+                    currentDate = new Date();
+                    if(!Objects.equals(update, "1")) {
+                        timestamp = String.valueOf(currentDate.getTime());
+                    } else {
+                        timestamp = extras.getString("timestamp");
+                        Log.i("BreakAbastecer", Objects.requireNonNullElse(timestamp, "timestamp is null"));
+                        if(timestamp == null){
+                            timestamp = String.valueOf(currentDate.getTime());
+                        }
+                        Log.i("UPDATE-Abastecer", String.valueOf(timestamp));
+                    }
 
                     String stringPreco = edtPreco.getText().toString();
                     String stringQuantidade = edtQuantidade.getText().toString();
@@ -226,9 +298,11 @@ public class AbastecerActivity extends AppCompatActivity {
                         }
                         abastecimento.setPreco(doublePreco);
                         abastecimento.setCarro(listaCarros.get(spinnerCarro.getSelectedItemPosition()));
+                        Log.i("SelectedCar", abastecimento.getCarro());
                         abastecimento.setData(formattedDate);
                         abastecimento.setQuantidade(doubleQuantidade);
                         abastecimento.setKms(kms);
+                        abastecimento.setTimestamp(timestamp);
                         if (!toggleReal.isChecked()) {
                             abastecimento.setReal("reais");
                             abastecimento.setQtdLitroAbastecida(quantidadeLitroAbastecida);
@@ -294,9 +368,20 @@ public class AbastecerActivity extends AppCompatActivity {
                 else{
                     intent.putExtra("real", "real");
                 }
-
+                Log.i("BreakAbastecer", "Before get user_ui");
+                if(extras != null && extras.getString("user_id") != null) {
+                    intent.putExtra("user_id", extras.getString("user_id"));
+                }
+                if (extras.getString("edit") != null) {
+                    intent.putExtra("edit", extras.getString("edit"));
+                }
+                Log.i("BreakAbastecer", "After get user_ui");
+                intent.putExtra("position", position);
+                intent.putExtra("date", date);
+                intent.putExtra("timestamp", timestamp);
+                intent.putExtra("idFuelling", idFuelling);
+                intent.putExtra("kms", edtKms.getText().toString());
                 startActivity(intent);
-                //finish();
             }
         });
     }
@@ -345,6 +430,20 @@ public class AbastecerActivity extends AppCompatActivity {
         }
     };
 
+    public void criandoOuAbrindoBancoDeDadosCarro(){
+
+        try {
+            bancoDeDados = openOrCreateDatabase("app_gasolina", MODE_PRIVATE, null);
+
+            bancoDeDados.execSQL("CREATE TABLE IF NOT EXISTS carros(id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    "marca VARCHAR, apelido VARCHAR)");
+        }catch (Exception e){
+            e.printStackTrace();
+            Log.i("Erro ", "ao criar tabela carros: "+e.toString());
+        }
+
+    }
+
     public void criandoOuAbrindoBancoDeDados(){
 
         try{
@@ -359,6 +458,7 @@ public class AbastecerActivity extends AppCompatActivity {
                     "real VARCHAR," +
                     "tipo VARCHAR," +
                     "qtdAbastecida DOUBLE," +
+                    "timestamp VARCHAR," +
                     "kms VARCHAR)");
 
         }catch (Exception e){
@@ -372,22 +472,28 @@ public class AbastecerActivity extends AppCompatActivity {
         if(!Objects.equals(update, "1")){
             Log.i("Create Abastecimento", "" + update);
             Log.i("Create Abastecimento", "" + Boolean.getBoolean(update));
+            Log.i("Create timestamp", "" + abastecimento.getTimestamp());
 
             try{
 
-                bancoDeDados.execSQL("INSERT INTO abastecimentos(posto, preco, carro, data, quantidade, real, tipo, qtdAbastecida, kms) " +
+                bancoDeDados.execSQL("INSERT INTO abastecimentos(posto, preco, carro, data, quantidade, real, tipo, qtdAbastecida, timestamp, kms) " +
                         "VALUES ('" +abastecimento.getPosto()+ "', '" +abastecimento.getPreco()+"', '"+abastecimento.getCarro()+"" +
                         "', '"+abastecimento.getData()+"', '"+abastecimento.getQuantidade()+"', '"+abastecimento.getReal()+"'," +
-                        " '"+abastecimento.getTipo()+"', '"+abastecimento.getQtdLitroAbastecida()+"', '"+abastecimento.getKms()+"')");
+                        " '"+abastecimento.getTipo()+"', '"+abastecimento.getQtdLitroAbastecida()+"', '"+abastecimento.getTimestamp()+"', '"+abastecimento.getKms()+"')");
 
+                if(userId != null){
+                    myRef.child("users/").child(userId).child(timestamp).setValue(abastecimento);
+                }
                 Toast.makeText(AbastecerActivity.this, "Abastecimento criado com sucesso!", Toast.LENGTH_LONG).show();
 
             }catch(Exception e){
                 e.printStackTrace();
-                Log.e("Erro ", " ao salvar carro: "+e.toString());
+                Log.e("Erro ", " ao salvar carro: "+e.getMessage());
             }
         } else{
             Log.i("Update Abastecimento", "doing update");
+            Log.i("Update timestamp", "" + abastecimento.getTimestamp());
+            Log.i("Update carro", "" + abastecimento.getCarro());
 
             try{
 
@@ -399,10 +505,17 @@ public class AbastecerActivity extends AppCompatActivity {
                         "real = '" + abastecimento.getReal() + "', " +
                         "tipo = '" + abastecimento.getTipo() + "', " +
                         "qtdAbastecida = '" + abastecimento.getQtdLitroAbastecida() + "', " +
+                        "timestamp = '" + abastecimento.getTimestamp() + "', " +
                         "kms = '" + abastecimento.getKms() + "'" +
-                        "WHERE id = " + id;
+                        "WHERE id = " + idFuelling;
 
                 bancoDeDados.execSQL(updateQuery);
+
+                Log.i("UpdateAbatecer", Objects.requireNonNullElse(userId, "user null"));
+
+                if(userId != null){
+                    myRef.child("users/").child(userId).child(timestamp).setValue(abastecimento);
+                }
 
                 Toast.makeText(AbastecerActivity.this, "Abastecimento atualizado com sucesso!", Toast.LENGTH_LONG).show();
 
@@ -415,7 +528,7 @@ public class AbastecerActivity extends AppCompatActivity {
 
             }catch(Exception e){
                 e.printStackTrace();
-                Log.e("Erro ", " ao salvar carro: "+e.toString());
+                Log.e("Erro ", " ao salvar carro: "+e.getMessage());
             }
         }
     }
@@ -467,47 +580,6 @@ public class AbastecerActivity extends AppCompatActivity {
                 listaCarros);
         adapterListaCarro.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerCarro.setAdapter(adapterListaCarro);
-    }
-
-    public void esconderMenuBar(){
-        if(flag == 1) {
-            // The UI options currently enabled are represented by a bitfield.
-            // getSystemUiVisibility() gives us that bitfield.
-            int uiOptions = this.getWindow().getDecorView().getSystemUiVisibility();
-            int newUiOptions = uiOptions;
-            boolean isImmersiveModeEnabled =
-                    ((uiOptions | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY) == uiOptions);
-            if (isImmersiveModeEnabled) {
-                Log.i(TAG, "Turning immersive mode mode off. ");
-            } else {
-                Log.i(TAG, "Turning immersive mode mode on.");
-            }
-
-            // Navigation bar hiding:  Backwards compatible to ICS.
-            if (Build.VERSION.SDK_INT >= 14) {
-                newUiOptions ^= View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
-            }
-
-            // Status bar hiding: Backwards compatible to Jellybean
-            if (Build.VERSION.SDK_INT >= 16) {
-                newUiOptions ^= View.SYSTEM_UI_FLAG_FULLSCREEN;
-            }
-
-            // Immersive mode: Backward compatible to KitKat.
-            // Note that this flag doesn't do anything by itself, it only augments the behavior
-            // of HIDE_NAVIGATION and FLAG_FULLSCREEN.  For the purposes of this sample
-            // all three flags are being toggled together.
-            // Note that there are two immersive mode UI flags, one of which is referred to as "sticky".
-            // Sticky immersive mode differs in that it makes the navigation and status bars
-            // semi-transparent, and the UI flag does not get cleared when the user interacts with
-            // the screen.
-            if (Build.VERSION.SDK_INT >= 18) {
-                newUiOptions ^= View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
-            }
-
-            this.getWindow().getDecorView().setSystemUiVisibility(newUiOptions);
-            flag = 0;
-        }
     }
 
     public void fullScreen() {
