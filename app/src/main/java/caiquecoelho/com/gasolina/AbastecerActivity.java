@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RadioButton;
@@ -34,9 +35,11 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
+import caiquecoelho.com.gasolina.helper.DatabaseHelper;
 import caiquecoelho.com.gasolina.model.Abastecimento;
 
 public class AbastecerActivity extends AppCompatActivity {
@@ -77,10 +80,27 @@ public class AbastecerActivity extends AppCompatActivity {
     private Date currentDate;
     private String timestamp;
 
+    AutoCompleteTextView autoCompleteTextView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_abastecer);
+
+        autoCompleteTextView = findViewById(R.id.edtPosto);
+        DatabaseHelper databaseHelper = new DatabaseHelper(this);
+
+        // Get all posto entries
+        List<String> postos = databaseHelper.getAllPostos();
+
+        // Create an ArrayAdapter using the string array and a default spinner layout
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, postos);
+
+        // Specify the layout to use when the list of choices appears
+        autoCompleteTextView.setAdapter(adapter);
+
+        // Set the minimum number of characters, after which the dropdown will start showing suggestions
+        autoCompleteTextView.setThreshold(0);
 
         edtQuantidade = findViewById(R.id.edtQuantidadeNew);
         currencyFormat = NumberFormat.getCurrencyInstance(new Locale("pt", "BR"));
@@ -291,8 +311,8 @@ public class AbastecerActivity extends AppCompatActivity {
                         String kms = edtKms.getText().toString();
 
                         Abastecimento abastecimento = new Abastecimento();
-                        if(!edtPosto.getText().toString().isEmpty()) {
-                            abastecimento.setPosto(edtPosto.getText().toString());
+                        if(!autoCompleteTextView.getText().toString().isEmpty()) {
+                            abastecimento.setPosto(autoCompleteTextView.getText().toString());
                         }else{
                             abastecimento.setPosto("Não Informado");
                         }
@@ -332,8 +352,8 @@ public class AbastecerActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(AbastecerActivity.this, CarroActivity.class);
-                if(!edtPosto.getText().toString().isEmpty()) {
-                    intent.putExtra("posto", edtPosto.getText().toString());
+                if(!autoCompleteTextView.getText().toString().isEmpty()) {
+                    intent.putExtra("posto", autoCompleteTextView.getText().toString());
                 }else{
                     intent.putExtra("posto", "");
                 }

@@ -287,8 +287,11 @@ public class HistoricoActivity extends AppCompatActivity {
                     SimpleDateFormat sdf = new SimpleDateFormat(pattern, Locale.getDefault());
                     Date date1 = sdf.parse(listaDatas.get(0));
                     Date date2 = sdf.parse(listaDatas.get(1));
-                    long diffInMillis = date2.getTime() - date1.getTime();
+                    Log.i("DATE", date1.toString());
+                    Log.i("DATE", date2.toString());
+                    long diffInMillis = date1.getTime() - date2.getTime();
                     int diffInDays = (int) TimeUnit.MILLISECONDS.toDays(diffInMillis);
+                    Log.i("DATE", "diffInDays: " + diffInDays);
                     // txtNextRefuelling.setText(diffInDays + " dias");
 
                     Calendar currentDate = Calendar.getInstance();

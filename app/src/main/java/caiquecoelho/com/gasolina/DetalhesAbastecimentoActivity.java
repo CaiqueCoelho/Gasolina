@@ -106,8 +106,10 @@ public class DetalhesAbastecimentoActivity extends AppCompatActivity {
 
         Double kmsForLiter = null;
         try{
-            kmsForLiter =  (Double.parseDouble(extras.getString("lastKms")) - Double.parseDouble(extras.getString("kms")))/ Double.parseDouble(extras.getString("lastLitrosAbastecidos"));
-            txtKmsPerLiter.setText(kmsForLiter.intValue() + " quilômetros por litro");
+            kmsForLiter = (Double.parseDouble(extras.getString("lastKms")) - Double.parseDouble(extras.getString("kms"))) / Double.parseDouble(extras.getString("lastLitrosAbastecidos"));
+            // Format the string to have only two decimal places
+            String formattedKmsForLiter = String.format("%.2f", kmsForLiter);
+            txtKmsPerLiter.setText(formattedKmsForLiter + " quilômetros por litro");
         } catch(Exception error){
             Log.i("kmsForLiter", error.getMessage());
         }
